@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import requests
 
 
 class BookspiderSpider(scrapy.Spider):
@@ -32,3 +33,15 @@ class BookspiderSpider(scrapy.Spider):
         title_body = response.css('header.entry-header')
         title = title_body.css('h1::text').extract_first()
         subtitle = title_body.css('h4::text').extract_first()
+        metadata_entry = title_body.css('.entry-meta')
+        thumbnail_url = metadata_entry.css('.entry-body-thumbnail a img::attr(src)').extract_first()
+        book_detail = metadata_entry.css('.book-detail')
+        footer = response.css('footer.entry-footer')
+        download_link = footer.css('.download-links a::attr(href)').extract_first()
+
+        self.download_file(download_link)
+
+
+    def download_file(self, url):
+        local_filename = url.split('/')[-1]
+        pdf = requests.get(url)
