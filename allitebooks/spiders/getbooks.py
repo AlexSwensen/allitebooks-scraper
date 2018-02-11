@@ -25,7 +25,10 @@ class BookspiderSpider(scrapy.Spider):
             book_body = book.css('.entry-body')
             book_link = book_body.css('a::attr(href)').extract_first()
             book_title = book_body.css('.entry-title a::text').extract_first()
-            yield {
-                'title': book_title,
-                'link': book_link
-            }
+            yield response.follow(book_link, callback=self.parse_book)
+
+
+    def parse_book(self, response):
+        title_body = response.css('header.entry-header')
+        title = title_body.css('h1::text').extract_first()
+        subtitle = title_body.css('h4::text').extract_first()
