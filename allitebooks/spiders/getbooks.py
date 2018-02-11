@@ -12,15 +12,20 @@ class BookspiderSpider(scrapy.Spider):
         for i in range(2, 747):
             urls.append(f'http://www.allitebooks.com/page/{i}/')
 
-        print(urls)
+        self.log(urls)
 
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
 
     def parse(self, response):
-        page = response.url.split("/")[-2]
-        filename = 'books-%s.html' % page
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file %s' % filename)
+
+        books = response.css('article')
+        for book in books:
+            book_body = book.css('.entry-body')
+            book_link = book_body.css('a::attr(href)').extract_first()
+            book_title = book_body.css('.entry-title a::text').extract_first()
+            yield {
+                'title': book_title,
+                'link': book_link
+            }
