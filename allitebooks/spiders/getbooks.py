@@ -12,9 +12,6 @@ class BookspiderSpider(scrapy.Spider):
 
         for i in range(2, 747):
             urls.append(f'http://www.allitebooks.com/page/{i}/')
-
-        self.log(urls)
-
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
@@ -44,4 +41,11 @@ class BookspiderSpider(scrapy.Spider):
 
     def download_file(self, url):
         local_filename = url.split('/')[-1]
-        pdf = requests.get(url)
+
+        pdf = requests.get(url, stream=True)
+
+        with open(f'./books/{local_filename}', 'wb') as fd:
+            for chunk in pdf.iter_content(1024):
+                fd.write(chunk)
+                self.log('writing chunk')
+
