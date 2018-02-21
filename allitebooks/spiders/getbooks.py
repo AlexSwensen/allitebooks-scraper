@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import requests
-
+from clint.textui import progress
 
 class BookspiderSpider(scrapy.Spider):
     name = 'getbooks'
@@ -46,12 +46,21 @@ class BookspiderSpider(scrapy.Spider):
         pdf.status_code
         if pdf.status_code == requests.codes.ok:
             print("Downloading file", local_filename)
-            self.log('Downloading filename:',local_filename)
-        self.log('Status Code:',pdf.status_code)
+            #self.log('Downloading filename:', local_filename)
+        else:
+            self.log("!!!Filed to download.!!!")
+        #self.log('Downloading filename:', local_filename)
+        self.log('Status Code:', pdf.status_code)
         #print('Start the download of %s: local_filename')
 
         with open(f'./books/{local_filename}', 'wb') as fd:
-            for chunk in pdf.iter_content(1024):
-                fd.write(chunk)
+            total_size = int(pdf.headers.get('content-length'))
+            print(total_size)
+            for chunk in progress.bar(pdf.iter_content(chunk_size=1024),expected_size=(total_size/1024)+1):
+                if chunk:
+                    fd.write(chunk)
+                    fd.flush()
+            #for chunk in pdf.iter_content(1024):
+                #fd.write(chunk)
                 #self.log('writing chunk ')
 
