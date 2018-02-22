@@ -28,7 +28,7 @@ class BookspiderSpider(scrapy.Spider):
             yield response.follow(book_link, callback=self.parse_book)
 
     def parse_book(self, response):
-        l = ItemLoader(item=AllitebooksItem(),response=response)
+        loader = ItemLoader(item=AllitebooksItem(), response=response)
 
         title_body = response.css('header.entry-header')
         title = title_body.css('h1::text').extract_first()
@@ -40,11 +40,11 @@ class BookspiderSpider(scrapy.Spider):
         download_link = footer.css('.download-links a::attr(href)').extract_first().replace(" ", "%20")
         print("link" ,download_link)
 
-        l.add_value('title', title)
-        l.add_value('download_link', download_link)
-        #l.add_value('')
+        loader.add_value('title', title)
+        loader.add_value('download_link', download_link)
 
-        return l.load_item()
+
+        return loader.load_item()
         #self.download_file(download_link)
 
     #def download_file(self, url):

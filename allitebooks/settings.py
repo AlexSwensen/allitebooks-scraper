@@ -64,10 +64,11 @@ CONCURRENT_REQUESTS_PER_IP = 16
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
+ITEM_PIPELINES = {
+    'scrapy.pipelines.files.FilesPipeline':1,
 #    'allitebooks.pipelines.AllitebooksPipeline': 300,
-#}
-
+}
+FILES_STORE = 'books'
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
