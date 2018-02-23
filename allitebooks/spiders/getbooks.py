@@ -5,6 +5,7 @@ from clint.textui import progress
 from scrapy.loader import ItemLoader
 from allitebooks.items import AllitebooksItem
 
+
 class BookspiderSpider(scrapy.Spider):
     name = 'getbooks'
     allowed_domains = ['www.allitebooks.com']
@@ -13,7 +14,7 @@ class BookspiderSpider(scrapy.Spider):
     def start_requests(self):
         urls = ['http://www.allitebooks.com/']
 
-        for i in range(1, 747):
+        for i in range(2, 747):
             urls.append(f'http://www.allitebooks.com/page/{i}/')
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -38,36 +39,37 @@ class BookspiderSpider(scrapy.Spider):
         book_detail = metadata_entry.css('.book-detail')
         footer = response.css('footer.entry-footer')
         download_link = footer.css('.download-links a::attr(href)').extract_first().replace(" ", "%20")
-        print("link" ,download_link)
+        print("link", download_link)
 
         loader.add_value('title', title)
+        loader.add_value('subtitle', subtitle)
+        loader.add_value('thumbnail_url', thumbnail_url)
         loader.add_value('download_link', download_link)
 
-
         return loader.load_item()
-        #self.download_file(download_link)
+        # self.download_file(download_link)
 
-    #def download_file(self, url):
-        #local_filename = url.split('/')[-1]
+    # def download_file(self, url):
+    # local_filename = url.split('/')[-1]
 
-       #pdf = get(url, stream=True)
-        # status_code = pdf.status_code
-        #if pdf.status_code == codes.ok:
-            #print("Downloading file:", local_filename)
-            # self.log('Downloading filename:', local_filename)
-            #with open(f'./books/{local_filename}', 'wb') as fd:
-                #total_size = int(pdf.headers.get('content-length'))
-                #print(total_size)
-                #for chunk in progress.bar(pdf.iter_content(chunk_size=1024), expected_size=(total_size / 1024) + 1):
-                    #if chunk:
-                       # fd.write(chunk)
-                        #fd.flush()
-                # for chunk in pdf.iter_content(1024):
-                # fd.write(chunk)
-                #fd.flush
-                # self.log('writing chunk ')
-       # else:
-            #self.log("!!!Filed to download.!!!")
-        # self.log('Downloading filename:', local_filename)
-        #self.log('Status Code:', pdf.status_code)
-        # print('Start the download of %s: local_filename')
+    # pdf = get(url, stream=True)
+    # status_code = pdf.status_code
+    # if pdf.status_code == codes.ok:
+    # print("Downloading file:", local_filename)
+    # self.log('Downloading filename:', local_filename)
+    # with open(f'./books/{local_filename}', 'wb') as fd:
+    # total_size = int(pdf.headers.get('content-length'))
+    # print(total_size)
+    # for chunk in progress.bar(pdf.iter_content(chunk_size=1024), expected_size=(total_size / 1024) + 1):
+    # if chunk:
+    # fd.write(chunk)
+    # fd.flush()
+    # for chunk in pdf.iter_content(1024):
+    # fd.write(chunk)
+    # fd.flush
+    # self.log('writing chunk ')
+    # else:
+    # self.log("!!!Filed to download.!!!")
+    # self.log('Downloading filename:', local_filename)
+    # self.log('Status Code:', pdf.status_code)
+    # print('Start the download of %s: local_filename')

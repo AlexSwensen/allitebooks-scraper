@@ -16,21 +16,21 @@ NEWSPIDER_MODULE = 'allitebooks.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'allitebooks (+http://www.yourdomain.com)'
+#USER_AGENT = 'allitebooks (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False
+ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 5
+#CONCURRENT_REQUESTS = 5
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 3
+#DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 16
-CONCURRENT_REQUESTS_PER_IP = 16
+#CONCURRENT_REQUESTS_PER_DOMAIN = 16
+#CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
@@ -52,9 +52,9 @@ CONCURRENT_REQUESTS_PER_IP = 16
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'allitebooks.middlewares.AllitebooksDownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+    'allitebooks.middlewares.AllitebooksDownloaderMiddleware': 543,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -65,10 +65,14 @@ CONCURRENT_REQUESTS_PER_IP = 16
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'scrapy.pipelines.files.FilesPipeline':1,
+    #'scrapy.pipelines.files.FilesPipeline':1,
+    'allitebooks.pipelines.AlliteebooksJsonPipeline': 300,
 #    'allitebooks.pipelines.AllitebooksPipeline': 300,
 }
 FILES_STORE = 'books'
+FEED_EXPORTERS = {
+    'jsonlines': 'scrapy.exporters.JsonLinesItemExporter',
+}
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
