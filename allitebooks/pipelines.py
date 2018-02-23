@@ -7,17 +7,15 @@
 
 from scrapy.exporters import JsonLinesItemExporter
 import json
+import pymongo
 
 class AllitebooksPipeline(object):
     def process_item(self, item, spider):
         return item
 
 class AlliteebooksJsonPipeline(object):
-    def __init__(self):
-        self.file = open("output2.json", 'wb')
-
     def open_spider(self, spider):
-
+        self.file = open("output2.json", 'w')
         self.exporter = JsonLinesItemExporter(self.file, encoding='utf8', ensure_ascii=False)
         self.exporter.start_exporting()
 
@@ -31,5 +29,30 @@ class AlliteebooksJsonPipeline(object):
     def process_item(self, item, spider):
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
-        #self.exporter.export_item(item)
+        #self.exporter.export_item(line)
+        return item
+
+class AllitebooksMongoDB(object):
+    clection_name = 'ebooks_items'
+
+    def __init__(self, mongo_uri, mongo_db):
+        self.mongo_uri = mongo_uri
+        self.mongo_uri = mongo_db
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri=crawler.settings.get('MONGO_URI'),
+            mongo_db=crawler.settings.get('MONGO_DATABSE', 'items')
+        )
+
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.db = self.client[self.mongo_db]
+
+    def close_spider(self, spider):
+        self.client.close()
+
+    def process_item(self, item, spider):
+        self.db[self.clection_name].insert_one(dict(item))
         return item
