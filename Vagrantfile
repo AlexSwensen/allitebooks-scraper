@@ -2,54 +2,62 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/xenial64"
-  config.vm.hostname = "MongoDb"
+  # config.vm.box = "ubuntu/xenial64"
+  #config.vm.network "private_network", ip: "10.0.0.10"
+  config.vm.define "webscraper" do |webscraper|
+    webscraper.vm.box = "ubuntu/xenial64"
+    webscraper.vm.network "forwarded_port", guest: 80, host:8080
+    webscraper.vm.network "private_network", ip: "10.0.0.10"
+    webscraper.vm.network "public_network", use_dhcp_assigned_default_route: true
+    webscraper.vm.hostname = "webscraper"
+    webscraper.vm.synced_folder ".", "/vagrant/allitebooks-scraper"
+    webscraper.vm.provider "virtualbox" do |vbw|
+      vbw.gui = false
+      vbw.memory = "1024"
+    end
+    webscraper.vm.provision "shell", inline: <<-SHELL
+      mkdir /home/vagrant/allitebooks-scraper
+      apt-get update
+      apt upgrade -y
+      apt-get install -y python3 python-pip
+      sudo pip install --upgrade pip
+      sudo pip install scrapy pymongo pipenv
+      sudo ufw enable
+      sudo ufw allow OpenSSH
+      SHELL
+    end
+  end
 
-  # config.vm.box_check_update = false
-
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-  config.vm.network "forwarded_port", guest: 27017, host: 27017 #mongodb
-  #config.vm.network "forwarded_port", guest: 27017, host: 27017
-  #config.vm.network "forwarded_port", guest: 27017, host: 27017
-
-  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
-  config.vm.network "forwarded_port", guest: 27017, host: 27017, host_ip: "127.0.0.1"
-
-  # config.vm.network "private_network", ip: "192.168.33.10"
-
-  config.vm.network "public_network"
-
-  config.vm.synced_folder "C:/Users/drmaq/Documents/Workspace/allitebooks-scraper", "/allitebooks-scraper"
-
-  config.vm.provider "virtualbox" do |vb|
-
-     vb.gui = false
-     vb.memory = "1024"
-   end
-
-  config.vm.provision "shell", inline: <<-SHELL
-    mkdir /home/vagrant/allitebooks-scraper
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6 -y --allow-unauthenticated
-
-    echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
-
-    apt-get update
-    apt upgrade -y
-
-    apt-get install -y --allow-unauthenticated  mongodb-org
-    apt-get install -y python3 python-pip
-    sudo pip install --upgrade pip
-    sudo pip install scrapy pymongo pipenv
-
-    sudo systemctl start mongod
-    sudo systemctl status mongod
-    sudo systemctl enable mongod
-    mongo
-    db.createUser({user:"king",pwd:"lordpoopypants",roles:[{role:"userAdminAnyDatabase",db:"admin"}]})
-
-    sudo ufw enable
-    sudo ufw allow OpenSSH
-    sudo ufw allow 27017
-
-  SHELL
+  config.vm.define "mongodbserver" do |mongodbserver|
+    mongodbserver.vm.box = "ubuntu/xenial64"
+    mongodbserver.vm.network "forwarded_port", guest: 80, host:8080
+    mongodbserver.vm.network "forwarded_port", guest:27017, host:27017
+    mongodbserver.vm.network "private_network", ip: "10.0.0.11"
+    mongodbserver.vm.network "public_network", use_dhcp_assigned_default_route: true
+    mongodbserver.vm.hostname = "mongodbserver"
+    mongodbserver.vm.provider "virtualbox" do |vbm|
+      vbm.gui = false
+      vbm.memory = "1024"
+    end
+    mongodbserver.vm.provision "shell", inline: <<-SHELL
+      sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6 -y --allow-unauthenticated
+      echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
+      apt-get update
+      apt upgrade -y
+      apt-get install -y --allow-unauthenticated  mongodb-org
+      sudo systemctl start mongod
+      sudo systemctl status mongod
+      sudo systemctl enable mongod
+      mongo
+      use admin
+      db.createUser({user:"king",pwd:"lordpoopypants",roles:[{role:"userAdminAnyDatabase",db:"admin"}]})
+      sudo sed 's/\#security/security\n\tauthorization: "enabled"'/ /etc/mongod.conf
+      sudo systemctl restart mongod
+      sudo systemctl status mongod
+      sudo ufw enable
+      sudo ufw allow OpenSSH
+      sudo ufw allow 27017
+      SHELL
+    end
+  end
 end
