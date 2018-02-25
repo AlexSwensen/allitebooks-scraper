@@ -4,7 +4,9 @@ from requests import codes, get
 from clint.textui import progress
 from scrapy.loader import ItemLoader
 from allitebooks.items import AllitebooksItem
+import logging
 
+logger = logging.getLogger('allitebookslogger')
 
 class BookspiderSpider(scrapy.Spider):
     name = 'getbooks'
@@ -39,6 +41,8 @@ class BookspiderSpider(scrapy.Spider):
         book_detail = metadata_entry.css('.book-detail')
         footer = response.css('footer.entry-footer')
         download_link = footer.css('.download-links a::attr(href)').extract_first().replace(" ", "%20")
+        #logger.log('Download Link -: %s')
+        #logger.log("Download Link %s",download_link)
         print("link", download_link)
 
         loader.add_value('title', title)

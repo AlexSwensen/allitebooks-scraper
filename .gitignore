@@ -2,5 +2,6 @@
 node_modules/
 *.pyc
 books*
+*.log
 
 books/*.pdf
