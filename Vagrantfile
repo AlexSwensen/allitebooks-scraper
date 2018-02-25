@@ -10,13 +10,12 @@ Vagrant.configure("2") do |config|
     webscraper.vm.network "private_network", ip: "10.0.0.10"
     webscraper.vm.network "public_network", use_dhcp_assigned_default_route: true
     webscraper.vm.hostname = "webscraper"
-    webscraper.vm.synced_folder ".", "/vagrant/allitebooks-scraper"
+    webscraper.vm.synced_folder ".", "/vagrant"
     webscraper.vm.provider "virtualbox" do |vbw|
       vbw.gui = false
       vbw.memory = "1024"
     end
     webscraper.vm.provision "shell", inline: <<-SHELL
-      mkdir /home/vagrant/allitebooks-scraper
       apt-get update
       apt upgrade -y
       apt-get install -y python3 python-pip
@@ -51,13 +50,13 @@ Vagrant.configure("2") do |config|
       mongo
       use admin
       db.createUser({user:"king",pwd:"lordpoopypants",roles:[{role:"userAdminAnyDatabase",db:"admin"}]})
-      sudo sed 's/\#security/security\n\tauthorization: "enabled"'/ /etc/mongod.conf
+      sudo sed 's/#security/security\n\tauthorization: "enabled"'/ /etc/mongod.conf
       sudo systemctl restart mongod
       sudo systemctl status mongod
       sudo ufw enable
       sudo ufw allow OpenSSH
       sudo ufw allow 27017
-      SHELL
+    SHELL
     end
   end
 end
