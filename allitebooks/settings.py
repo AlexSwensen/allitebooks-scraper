@@ -67,8 +67,11 @@ ITEM_PIPELINES = {
     'scrapy.pipelines.files.FilesPipeline': 1,
     'allitebooks.pipelines.AlliteebooksJsonPipeline': 300,
     # 'allitebooks.pipelines.AllitebooksPipeline': 300,
+    'allitebooks.pipelines.AllitebooksImagesPipeline':301,
+    'allitebooks.pipelines.AllitebooksFilesPipeline':302,
 }
 FILES_STORE = 'books'
+IMAGE_STORE = 'images'
 FEED_EXPORTERS = {
     'jsonlines': 'scrapy.exporters.JsonLinesItemExporter',
 }

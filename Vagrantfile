@@ -2,8 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  # config.vm.box = "ubuntu/xenial64"
-  #config.vm.network "private_network", ip: "10.0.0.10"
   config.vm.define "webscraper" do |webscraper|
     webscraper.vm.box = "ubuntu/xenial64"
     webscraper.vm.network "forwarded_port", guest: 80, host:8080
@@ -11,10 +9,10 @@ Vagrant.configure("2") do |config|
     webscraper.vm.network "public_network", use_dhcp_assigned_default_route: true
     webscraper.vm.hostname = "webscraper"
     webscraper.vm.synced_folder ".", "/vagrant"
-    webscraper.vm.provider "virtualbox" do |vbw|
-      vbw.gui = false
-      vbw.memory = "1024"
-    end
+        webscraper.vm.provider "virtualbox" do |vbw|
+          vbw.gui = false
+          vbw.memory = "1024"
+        end
     webscraper.vm.provision "shell", inline: <<-SHELL
       apt-get update
       apt upgrade -y
@@ -23,7 +21,7 @@ Vagrant.configure("2") do |config|
       sudo pip install scrapy pymongo pipenv
       sudo ufw enable
       sudo ufw allow OpenSSH
-      SHELL
+     SHELL
     end
   end
 
@@ -56,7 +54,7 @@ Vagrant.configure("2") do |config|
       sudo ufw enable
       sudo ufw allow OpenSSH
       sudo ufw allow 27017
-    SHELL
+     SHELL
     end
   end
 end

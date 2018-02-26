@@ -9,6 +9,10 @@ from scrapy.exporters import JsonLinesItemExporter
 import json
 import pymongo
 from scrapy import log
+from scrapy.pipelines.images import ImagesPipeline
+from scrapy.exceptions import DropItem
+from scrapy.pipelines.files import FilesPipeline
+import scrapy
 
 class AllitebooksPipeline(object):
     def process_item(self, item, spider):
@@ -57,4 +61,28 @@ class AllitebooksMongoDB(object):
     def process_item(self, item, spider):
         self.db[self.clection_name].insert_one(dict(item))
         log.msg("Ebook entry add to database!",level=log.DEBUG, spider=spider)
+        return item
+
+class AllitebooksImagesPipeline(ImagesPipeline):
+    def get_media_requests(self, item, info):
+        for thumbnail_url in item['thumbnail_url']:
+            yield scrapy.Request(thumbnail_url)
+
+    def item_completed(self, results, item, info):
+        thumbnail_url = [x['path'] for ok, x in results if ok]
+        if not thumbnail_url:
+            raise DropItem("Item contains no images")
+        item['thumbnail_url'] = thumbnail_url
+        return item
+
+class AllitebooksFilesPipeline(FilesPipeline):
+    def get_media_requests(self, item, info):
+        for download_link in item['download_link']:
+            yield scrapy.Request(download_link)
+
+    def item_completed(self, results, item, info):
+        download_link = [x['path'] for ok, x in results if ok]
+        if not download_link:
+            raise DropItem("Item contains no Files")
+        item['download_link'] = download_link
         return item
