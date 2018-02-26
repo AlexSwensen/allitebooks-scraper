@@ -3,5 +3,5 @@ node_modules/
 *.pyc
 books*
 *.log
-
+.vagrant
 books/*.pdf
