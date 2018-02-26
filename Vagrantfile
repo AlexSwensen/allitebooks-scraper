@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
       sudo ufw enable
       sudo ufw allow OpenSSH
      SHELL
-    end
+
   end
 
   config.vm.define "mongodbserver" do |mongodbserver|
@@ -55,6 +55,6 @@ Vagrant.configure("2") do |config|
       sudo ufw allow OpenSSH
       sudo ufw allow 27017
      SHELL
-    end
+
   end
 end
