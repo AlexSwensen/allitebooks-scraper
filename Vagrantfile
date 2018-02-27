@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
     webscraper.vm.network "private_network", ip: "10.0.0.10"
     webscraper.vm.network "public_network", use_dhcp_assigned_default_route: true
     webscraper.vm.hostname = "webscraper"
-    webscraper.vm.synced_folder ".", "/vagrant"
+    webscraper.vm.synced_folder ".", "/home/vagrant/"
         webscraper.vm.provider "virtualbox" do |vbw|
           vbw.gui = false
           vbw.memory = "1024"
@@ -22,12 +22,11 @@ Vagrant.configure("2") do |config|
       sudo ufw enable
       sudo ufw allow OpenSSH
      SHELL
-    end
   end
 
   config.vm.define "mongodbserver" do |mongodbserver|
     mongodbserver.vm.box = "ubuntu/xenial64"
-    mongodbserver.vm.network "forwarded_port", guest: 80, host:8080
+    mongodbserver.vm.network "forwarded_port", guest: 80, host:8081
     mongodbserver.vm.network "forwarded_port", guest:27017, host:27017
     mongodbserver.vm.network "private_network", ip: "10.0.0.11"
     mongodbserver.vm.network "public_network", use_dhcp_assigned_default_route: true
@@ -55,6 +54,5 @@ Vagrant.configure("2") do |config|
       sudo ufw allow OpenSSH
       sudo ufw allow 27017
      SHELL
-    end
   end
 end

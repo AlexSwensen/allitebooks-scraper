@@ -29,7 +29,7 @@ CONCURRENT_REQUESTS = 5
 # DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
-# CONCURRENT_REQUESTS_PER_IP = 16
+CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
 # COOKIES_ENABLED = False
@@ -71,6 +71,8 @@ ITEM_PIPELINES = {
     'allitebooks.pipelines.AllitebooksFilesPipeline':302,
 }
 FILES_STORE = 'books'
+FILES_URLS_FIELD = 'download_link'
+FILES_RESULTS_FIELD = 'local_filename'
 IMAGE_STORE = 'images'
 FEED_EXPORTERS = {
     'jsonlines': 'scrapy.exporters.JsonLinesItemExporter',
@@ -108,7 +110,7 @@ JSONRPC_LOGFILE = 'jsonrpc.log'
 JSONRPC_PORT = [6080]
 JSONRPC_HOST = '127.0.0.1'
 
-LOG_ENABLED = True
+LOG_ENABLED = False
 LOG_FILE = 'allitebooks.log'
 LOG_ENCODING = 'utf-8'
 LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'

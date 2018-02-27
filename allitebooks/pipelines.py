@@ -5,18 +5,21 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-from scrapy.exporters import JsonLinesItemExporter
 import json
+
 import pymongo
-from scrapy import log
-from scrapy.pipelines.images import ImagesPipeline
-from scrapy.exceptions import DropItem
-from scrapy.pipelines.files import FilesPipeline
 import scrapy
+from scrapy import log
+from scrapy.exceptions import DropItem
+from scrapy.exporters import JsonLinesItemExporter
+from scrapy.pipelines.files import FilesPipeline
+from scrapy.pipelines.images import ImagesPipeline
+
 
 class AllitebooksPipeline(object):
     def process_item(self, item, spider):
         return item
+
 
 class AlliteebooksJsonPipeline(object):
     def open_spider(self, spider):
@@ -34,8 +37,9 @@ class AlliteebooksJsonPipeline(object):
     def process_item(self, item, spider):
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
-        #self.exporter.export_item(line)
+        # self.exporter.export_item(line)
         return item
+
 
 class AllitebooksMongoDB(object):
     clection_name = 'ebooks_items'
@@ -60,8 +64,9 @@ class AllitebooksMongoDB(object):
 
     def process_item(self, item, spider):
         self.db[self.clection_name].insert_one(dict(item))
-        log.msg("Ebook entry add to database!",level=log.DEBUG, spider=spider)
+        log.msg("Ebook entry add to database!", level=log.DEBUG, spider=spider)
         return item
+
 
 class AllitebooksImagesPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
@@ -75,14 +80,16 @@ class AllitebooksImagesPipeline(ImagesPipeline):
         item['thumbnail_url'] = thumbnail_url
         return item
 
+
 class AllitebooksFilesPipeline(FilesPipeline):
+
     def get_media_requests(self, item, info):
         for download_link in item['download_link']:
             yield scrapy.Request(download_link)
 
     def item_completed(self, results, item, info):
-        download_link = [x['path'] for ok, x in results if ok]
-        if not download_link:
+        local_filename = [x['path'] for ok, x in results if ok]
+        if not local_filename:
             raise DropItem("Item contains no Files")
-        item['download_link'] = download_link
+        item['local_filename'] = local_filename
         return item

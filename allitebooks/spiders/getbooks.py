@@ -44,11 +44,14 @@ class BookspiderSpider(scrapy.Spider):
         #logger.log('Download Link -: %s')
         #logger.log("Download Link %s",download_link)
         print("link", download_link)
+        local_filename = download_link.split('/')[-1].replace("%20", " ")
+        print("Name",local_filename)
 
         loader.add_value('title', title)
         loader.add_value('subtitle', subtitle)
         loader.add_value('thumbnail_url', thumbnail_url)
         loader.add_value('download_link', download_link)
+        loader.add_value('local_filename', local_filename)
 
         return loader.load_item()
         # self.download_file(download_link)

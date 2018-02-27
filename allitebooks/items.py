@@ -15,4 +15,5 @@ class AllitebooksItem(scrapy.Item):
     subtitle = scrapy.Field()
     thumbnail_url = scrapy.Field()
     download_link = scrapy.Field()
+    local_filename = scrapy.Field()
 
