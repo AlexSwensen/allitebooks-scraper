@@ -71,6 +71,8 @@ ITEM_PIPELINES = {
     'allitebooks.pipelines.AllitebooksFilesPipeline':302,
 }
 FILES_STORE = 'books'
+Download_link = ''
+
 IMAGE_STORE = 'images'
 FEED_EXPORTERS = {
     'jsonlines': 'scrapy.exporters.JsonLinesItemExporter',

@@ -4,11 +4,14 @@
 Vagrant.configure("2") do |config|
   config.vm.define "webscraper" do |webscraper|
     webscraper.vm.box = "ubuntu/xenial64"
-    webscraper.vm.network "forwarded_port", guest: 80, host:8080
-    webscraper.vm.network "private_network", ip: "10.0.0.10"
+    webscraper.vm.network "forwarded_port", guest: 80, host:8081
+    webscraper.vm.network "forwarded_port", guest: 22, host:2221
+    #webscraper.vm.network "private_network", type: "dhcp""
     webscraper.vm.network "public_network", use_dhcp_assigned_default_route: true
     webscraper.vm.hostname = "webscraper"
-    webscraper.vm.synced_folder ".", "/vagrant"
+    webscraper.ssh.username = "king"
+    webscraper.ssh.password = "subject"
+    webscraper.vm.synced_folder "allitebooks/", "/home/vagrant"
         webscraper.vm.provider "virtualbox" do |vbw|
           vbw.gui = false
           vbw.memory = "1024"
@@ -19,8 +22,8 @@ Vagrant.configure("2") do |config|
       apt-get install -y python3 python-pip
       sudo pip install --upgrade pip
       sudo pip install scrapy pymongo pipenv
-      sudo ufw enable
-      sudo ufw allow OpenSSH
+      #sudo ufw enable
+      #sudo ufw allow OpenSSH
      SHELL
 
   end
@@ -45,15 +48,15 @@ Vagrant.configure("2") do |config|
       sudo systemctl start mongod
       sudo systemctl status mongod
       sudo systemctl enable mongod
-      mongo
-      use admin
-      db.createUser({user:"king",pwd:"lordpoopypants",roles:[{role:"userAdminAnyDatabase",db:"admin"}]})
+      #mongo
+      #use admin
+      #db.createUser({user:"king",pwd:"lordpoopypants",roles:[{role:"userAdminAnyDatabase",db:"admin"}]})
       sudo sed 's/#security/security\n\tauthorization: "enabled"'/ /etc/mongod.conf
       sudo systemctl restart mongod
       sudo systemctl status mongod
-      sudo ufw enable
-      sudo ufw allow OpenSSH
-      sudo ufw allow 27017
+      #sudo ufw enable
+      #sudo ufw allow OpenSSH
+      #sudo ufw allow 27017
      SHELL
 
   end
