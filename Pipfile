@@ -13,7 +13,8 @@ name = "pypi"
 
 scrapy = "*"
 requests = "*"
-
+pymongo = "*"
+pillow = "*"
 
 [requires]
 

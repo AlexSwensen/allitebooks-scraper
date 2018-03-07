@@ -11,4 +11,9 @@ import scrapy
 class AllitebooksItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    title = scrapy.Field()
+    subtitle = scrapy.Field()
+    thumbnail_url = scrapy.Field()
+    download_link = scrapy.Field()
+    downloads = scrapy.Field()
+

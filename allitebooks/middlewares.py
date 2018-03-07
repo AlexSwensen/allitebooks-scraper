@@ -72,6 +72,7 @@ class AllitebooksDownloaderMiddleware(object):
         # Called for each request that goes through the downloader
         # middleware.
 
+
         # Must either:
         # - return None: continue processing this request
         # - or return a Response object

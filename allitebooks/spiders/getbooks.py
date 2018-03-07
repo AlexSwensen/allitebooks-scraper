@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import requests
+from requests import codes, get
+from clint.textui import progress
+from scrapy.loader import ItemLoader
+from allitebooks.items import AllitebooksItem
+import logging
 
+logger = logging.getLogger('allitebookslogger')
 
 class BookspiderSpider(scrapy.Spider):
     name = 'getbooks'
     allowed_domains = ['www.allitebooks.com']
+
     # start_urls = ['http://www.allitebooks.com']
     def start_requests(self):
         urls = ['http://www.allitebooks.com/']
@@ -14,7 +20,6 @@ class BookspiderSpider(scrapy.Spider):
             urls.append(f'http://www.allitebooks.com/page/{i}/')
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
-
 
     def parse(self, response):
 
@@ -25,8 +30,9 @@ class BookspiderSpider(scrapy.Spider):
             book_title = book_body.css('.entry-title a::text').extract_first()
             yield response.follow(book_link, callback=self.parse_book)
 
-
     def parse_book(self, response):
+        loader = ItemLoader(item=AllitebooksItem(), response=response)
+
         title_body = response.css('header.entry-header')
         title = title_body.css('h1::text').extract_first()
         subtitle = title_body.css('h4::text').extract_first()
@@ -34,18 +40,17 @@ class BookspiderSpider(scrapy.Spider):
         thumbnail_url = metadata_entry.css('.entry-body-thumbnail a img::attr(src)').extract_first()
         book_detail = metadata_entry.css('.book-detail')
         footer = response.css('footer.entry-footer')
-        download_link = footer.css('.download-links a::attr(href)').extract_first()
+        download_link = footer.css('.download-links a::attr(href)').extract_first().replace(" ", "%20")
+        #logger.log('Download Link -: %s')
+        #logger.log("Download Link %s",download_link)
+        print("link", download_link)
+        local_filename = download_link.split('/')[-1].replace("%20", " ")
+        print("Name",local_filename)
 
-        self.download_file(download_link)
+        loader.add_value('title', title)
+        loader.add_value('subtitle', subtitle)
+        loader.add_value('thumbnail_url', thumbnail_url)
+        loader.add_value('download_link', download_link)
+        loader.add_value('local_filename', local_filename)
 
-
-    def download_file(self, url):
-        local_filename = url.split('/')[-1]
-
-        pdf = requests.get(url, stream=True)
-
-        with open(f'./books/{local_filename}', 'wb') as fd:
-            for chunk in pdf.iter_content(1024):
-                fd.write(chunk)
-                self.log('writing chunk')
-
+        return loader.load_item()
