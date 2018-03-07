@@ -83,10 +83,16 @@ class AllitebooksImagesPipeline(ImagesPipeline):
 
 
 class AllitebooksFilesPipeline(FilesPipeline):
+    def file_path(self, requests, response=None, info=None):
+        file_guid = request.url.split('/')[-1]
+        print('File: ', file_guid)
+        return 'full/%s' % file_guid
+
     def get_media_requests(self, item, info):
         for download_link in item['download_link']:
             print('Download link = ', item['title'])
-            yield scrapy.Request(download_link)
+            meta = {'filename ': item['title']}
+            yield scrapy.Request(url=download_link, meta=meta)
 
     def item_completed(self, results, item, info):
         download_link = [x['path']for ok, x in results if ok]

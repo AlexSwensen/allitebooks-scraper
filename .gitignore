@@ -5,3 +5,4 @@ books*
 *.log
 .vagrant
 books/*.pdf
+.jsonl
